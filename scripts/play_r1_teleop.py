@@ -71,8 +71,8 @@ parser.add_argument(
     "--camera",
     type=str,
     default="chase",
-    choices=["chase", "pov", "shoulder", "isometric", "free"],
-    help="Camera view mode: chase (behind robot looking forward), pov (robot head POV), shoulder, isometric, free.",
+    choices=["chase", "pov", "front", "shoulder", "isometric", "free"],
+    help="Camera view: chase (behind looking forward), pov (robot head POV), front (facing robot), shoulder, isometric, free.",
 )
 parser.add_argument(
     "--status_every", type=int, default=0, help="Print commanded vs actual base velocity every N steps (0 = off)."
@@ -251,7 +251,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
         # -- teleop and camera wiring ------------------------------------------
         keyboard = _build_keyboard(env.unwrapped.device)
-        CAMERA_MODES = ["chase", "pov", "shoulder", "isometric", "free"]
+        CAMERA_MODES = ["chase", "pov", "front", "shoulder", "isometric", "free"]
         camera_state = {"mode": args_cli.camera}
         CAMERA_CONFIGS = {
             "chase": {
@@ -262,7 +262,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             "pov": {
                 "eye_offset": torch.tensor([[0.15, 0.0, 1.30]]),
                 "lookat_offset": torch.tensor([[5.0, 0.0, 1.25]]),
-                "name": "First-Person POV (Head Cam looking forward)",
+                "name": "First-Person POV (Robot Eyes/Head looking forward)",
+            },
+            "front": {
+                "eye_offset": torch.tensor([[2.5, 0.0, 1.2]]),
+                "lookat_offset": torch.tensor([[0.0, 0.0, 0.9]]),
+                "name": "Front View (Facing Robot Head-On)",
             },
             "shoulder": {
                 "eye_offset": torch.tensor([[-1.8, -0.45, 1.4]]),
@@ -281,7 +286,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             new_idx = (curr_idx + 1) % len(CAMERA_MODES)
             camera_state["mode"] = CAMERA_MODES[new_idx]
             mode_name = CAMERA_CONFIGS.get(camera_state["mode"], {}).get("name", "Free / Manual")
-            print(f"[CAMERA] Switched to: {mode_name} (Mode: {camera_state[mode]})")
+            print(f"[CAMERA] Switched to: {mode_name} (Mode: {camera_state["mode"]})")
 
         if keyboard is not None:
             keyboard.add_callback("C", _cycle_camera)
@@ -295,7 +300,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             print("   A / D : turn left / right")
             print("   Q / E : strafe left / right")
             print("   L     : zero all commands (stand)")
-            print("   C / V : cycle camera view (Behind / POV / Shoulder / Iso)")
+            print("   C / V : cycle camera views (Behind / POV / Front / Shoulder / Iso)")
             print("=" * 62)
         else:
             command_term.vel_command_b[:] = torch.tensor(
