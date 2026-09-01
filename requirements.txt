@@ -1,0 +1,14 @@
+# Unitree R1 Locomotion in Isaac Sim & Isaac Lab
+# Core Frameworks
+torch>=2.4.0
+torchvision
+gymnasium>=0.29.0
+numpy>=1.24.0
+opencv-python>=4.8.0
+
+# RSL-RL Reinforcement Learning Library
+rsl-rl-lib>=2.3.0
+
+# Omniverse & Isaac Sim / Isaac Lab (installed via NVIDIA Isaac Sim / Lab wheels)
+# isaacsim>=6.0.0.1
+# isaaclab>=6.1.17
