@@ -91,7 +91,7 @@ class R1FlatRewards(R1Rewards):
     joint_deviation_head = RewTerm(
         func=mdp.joint_deviation_l1,
         weight=-0.3,
-        params={asset_cfg: SceneEntityCfg(robot, joint_names=[head_.*_joint])},
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["head_.*_joint"])},
     )
     joint_deviation_waist = RewTerm(
         func=mdp.joint_deviation_l1,
