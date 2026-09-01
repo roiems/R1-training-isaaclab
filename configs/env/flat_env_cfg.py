@@ -60,6 +60,13 @@ class R1FlatRewards(R1Rewards):
         },
     )
 
+    # Standing Still Joint Regularizer (Locks natural stance when velocity command is ~0)
+    stand_still = RewTerm(
+        func=mdp.stand_still_joint_deviation_l1,
+        weight=-1.5,
+        params={command_name: base_velocity, command_threshold: 0.08},
+    )
+
     # 5. Anti-Foot-Slide Penalty
     feet_slide = RewTerm(
         func=mdp.feet_slide,

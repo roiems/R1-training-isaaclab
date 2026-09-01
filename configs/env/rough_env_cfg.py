@@ -135,7 +135,8 @@ class R1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.feet_slide = None
         self.rewards.dof_torques_l2.weight = 0.0
 
-        self.commands.base_velocity.ranges.lin_vel_x = (0.2, 1.2)
+        self.commands.base_velocity.ranges.lin_vel_x = (-0.5, 1.2)
+        self.commands.base_velocity.rel_standing_envs = 0.20
         self.commands.base_velocity.ranges.lin_vel_y = (-0.2, 0.2)
         self.commands.base_velocity.ranges.ang_vel_z = (-0.8, 0.8)
 
