@@ -64,7 +64,7 @@ class R1FlatRewards(R1Rewards):
     stand_still = RewTerm(
         func=mdp.stand_still_joint_deviation_l1,
         weight=-1.5,
-        params={command_name: base_velocity, command_threshold: 0.08},
+        params={"command_name": "base_velocity", "command_threshold": 0.08},
     )
 
     # 5. Anti-Foot-Slide Penalty
