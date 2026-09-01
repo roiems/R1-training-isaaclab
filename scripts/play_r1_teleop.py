@@ -11,6 +11,14 @@ import argparse
 import contextlib
 import os
 import sys
+
+# Ensure script dir and IsaacLab rsl_rl dir are on sys.path for cli_args
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+isaaclab_rsl_dir = "/home/rriemer/IsaacLab/scripts/reinforcement_learning/rsl_rl"
+if os.path.exists(isaaclab_rsl_dir) and isaaclab_rsl_dir not in sys.path:
+    sys.path.insert(0, isaaclab_rsl_dir)
 import time
 from importlib import metadata
 from packaging import version
@@ -29,12 +37,10 @@ from isaaclab.envs import (
 )
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.math import quat_apply_yaw
-from isaaclab.utils.pretrained_checkpoint import (
-    handle_deprecated_rsl_rl_cfg,
-)
+
 from isaaclab.utils.string import list_intersection, string_to_callable
-from isaaclab_rl.rsl_rl import RslRlBaseRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx
-from isaaclab_rl.utils.seed import configure_seed
+from isaaclab_rl.rsl_rl import RslRlBaseRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx, handle_deprecated_rsl_rl_cfg
+from isaaclab.utils.seed import configure_seed
 
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import (
