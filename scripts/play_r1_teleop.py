@@ -73,7 +73,14 @@ parser.add_argument(
     help="Path to a static scene USD to use as the ground instead of the training terrain.",
 )
 parser.add_argument(
-    "--camera",
+    "--no-lock-head",
+    dest="lock_head",
+    action="store_false",
+    default=True,
+    help="Lock head pitch/yaw to 0.0 so the robot always looks straight forward.",
+)
+parser.add_argument(
+    "--camera", 
     type=str,
     default="chase",
     choices=["chase", "pov", "front", "shoulder", "isometric", "free"],
@@ -339,6 +346,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                                 cmd = torch.clamp(cmd, cmd_low, cmd_high)
                         command_term.vel_command_b[:] = cmd
                     actions = policy(obs)
+                    if args_cli.lock_head:
+                        if not hasattr(env, "_head_joint_ids"):
+                            env._head_joint_ids, _ = robot.find_joints(["head_.*_joint"])
+                        if len(env._head_joint_ids) > 0:
+                            actions[:, env._head_joint_ids] = 0.0
                     obs, _, dones, _ = env.step(actions)
 
                     # --- Dynamic Camera Tracking in Direction Robot Faces ---
