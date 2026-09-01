@@ -28,12 +28,11 @@ from isaaclab.envs import (
     ManagerBasedRLEnvCfg,
 )
 from isaaclab.utils.assets import retrieve_file_path
-from isaaclab.utils.dict import list_intersection
 from isaaclab.utils.math import quat_apply_yaw
 from isaaclab.utils.pretrained_checkpoint import (
     handle_deprecated_rsl_rl_cfg,
 )
-from isaaclab.utils.string import string_to_callable
+from isaaclab.utils.string import list_intersection, string_to_callable
 from isaaclab_rl.rsl_rl import RslRlBaseRunnerCfg, RslRlVecEnvWrapper, export_policy_as_jit, export_policy_as_onnx
 from isaaclab_rl.utils.seed import configure_seed
 
