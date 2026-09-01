@@ -67,7 +67,20 @@ parser.add_argument("--seed", type=int, default=None, help="Seed used for the en
 parser.add_argument("--real-time", action="store_true", default=True, help="Run in real-time, if possible.")
 parser.add_argument("--external_callback", default=None, help="Fully qualified path to an externally defined callback.")
 parser.add_argument(
-    "--warehouse",
+    "--spawn_yaw",
+    type=float,
+    default=180.0,
+    help="Initial yaw orientation angle in degrees (default: 180.0 to face warehouse shelves).",
+)
+parser.add_argument(
+    "--spawn_pos",
+    type=float,
+    nargs=3,
+    default=[0.0, 0.0, 0.85],
+    help="Initial (x, y, z) spawn position in meters (default: 0.0 0.0 0.85).",
+)
+parser.add_argument(
+    "--warehouse", 
     type=str,
     default=None,
     help="Path to a static scene USD to use as the ground instead of the training terrain.",
@@ -173,7 +186,7 @@ def _build_keyboard(device: str):
 
 
 def _apply_teleop_overrides(env_cfg):
-    """Stop the command manager from fighting the keyboard."""
+    """Stop the command manager from fighting the keyboard and set custom spawn orientation."""
     vel = env_cfg.commands.base_velocity
     vel.resampling_time_range = (1.0e9, 1.0e9)
     vel.rel_standing_envs = 0.0
@@ -181,7 +194,30 @@ def _apply_teleop_overrides(env_cfg):
     vel.rel_heading_envs = 0.0
     vel.debug_vis = True
     env_cfg.episode_length_s = 1.0e9
-    env_cfg.events.push_robot = None
+    if hasattr(env_cfg.events, "push_robot"):
+        env_cfg.events.push_robot = None
+
+    rad = float(np.radians(args_cli.spawn_yaw))
+    w = float(np.cos(rad / 2.0))
+    z = float(np.sin(rad / 2.0))
+    sx, sy, sz = [float(v) for v in args_cli.spawn_pos]
+
+    if hasattr(env_cfg.scene, "robot"):
+        env_cfg.scene.robot.init_state.rot = (w, 0.0, 0.0, z)
+        env_cfg.scene.robot.init_state.pos = (sx, sy, sz)
+
+    if hasattr(env_cfg.events, "reset_base") and env_cfg.events.reset_base is not None:
+        env_cfg.events.reset_base.params = {
+            "pose_range": {"x": (sx, sx), "y": (sy, sy), "yaw": (rad, rad)},
+            "velocity_range": {
+                "x": (0.0, 0.0),
+                "y": (0.0, 0.0),
+                "z": (0.0, 0.0),
+                "roll": (0.0, 0.0),
+                "pitch": (0.0, 0.0),
+                "yaw": (0.0, 0.0),
+            },
+        }
 
     if args_cli.follow:
         env_cfg.viewer.origin_type = "asset_root"
